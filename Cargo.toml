@@ -1,0 +1,8 @@
+[package]
+name = "vigenere"
+version = "0.1.0"
+authors = ["Sebastian Steiner <e11777731@student.tuwien.ac.at>"]
+edition = "2018"
+
+[dependencies]
+clap = "~2.32.0"
