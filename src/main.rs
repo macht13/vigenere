@@ -1,80 +1,62 @@
-extern crate clap;
-use clap::{App, Arg};
-use std::io;
+#[macro_use]
+extern crate text_io;
 
 fn main() {
-    let matches = App::new("Vigenere solver")
-        .version("0.1")
-        .author(clap::crate_authors!("\n"))
-        .arg(
-            Arg::with_name("decode")
-                .help("Specify to decode a string")
-                .takes_value(true)
-                .value_name("cipher_text")
-                .short("d")
-                .long("decode"),
-        )
-        .arg(
-            Arg::with_name("encode")
-                .help("Specify to encode a string")
-                .takes_value(true)
-                .value_name("plain_text")
-                .short("e")
-                .long("encode"),
-        )
-        .get_matches();
-
-    if matches.is_present("decode") {
-        let cipher = matches.value_of("decode").unwrap().to_uppercase();
-        decoder(cipher);
-    } else if matches.is_present("encode") {
-        let plain = matches.value_of("encode").unwrap().to_uppercase();
-        encoder(plain);
-    } else {
-        println!("You need to supply either of\n-e PLAINTEXT\n-d CIPHERTEXT");
-        return;
-    }
+    println!("Do you want to (E)ncrypt or (D)ecrypt? [E/D]");
+    let mode: String = read!("{}\n");
+    match mode
+        .to_uppercase()
+        .chars()
+        .next()
+        .expect("Invalid input supplied")
+    {
+        'E' => encoder(),
+        'D' => decoder(),
+        _ => println!("Invalid! Please enter either E or D"),
+    };
 }
 
-fn encoder(plain: String) {
+fn encoder() {
+    // get input
+    println!("Please enter plaintext:");
+    let mut plain: String = read!("{}\n");
+    plain = plain.to_uppercase();
+    println!("Now please enter any number of keys as single lines:");
     // get key and encrypt
     loop {
         // read key
-        let mut key = String::new();
-        io::stdin()
-            .read_line(&mut key)
-            .expect("Failed to read line!");
-        let mut key = key.to_uppercase();
-        // remove trailing \n
-        key.pop();
+        let mut key: String = read!("{}\n");
+        key = key.to_uppercase();
+
         let mut enciphered: Vec<u8> = Vec::new();
         // iterate over each character of plain text and key (cyclic)
         for (a, b) in plain.bytes().zip(key.bytes().cycle()) {
             // compute to decoded value and add it to the vector
             enciphered.push(encode(a, b));
         }
-        println!("{}", std::str::from_utf8(&enciphered).unwrap());
+        println!("Cipher: {}", std::str::from_utf8(&enciphered).unwrap());
     }
 }
 
-fn decoder(cipher: String) {
+fn decoder() {
+    // get input
+    println!("Please enter ciphertext:");
+    let mut cipher: String = read!("{}\n");
+    cipher = cipher.to_uppercase();
+    println!("Now please enter any number of keys as single lines:");
     // get key and decrypt
     loop {
         // read key
-        let mut key = String::new();
-        io::stdin()
-            .read_line(&mut key)
-            .expect("Failed to read line!");
-        let mut key = key.to_uppercase();
-        // remove trailing \n
-        key.pop();
+        let mut key: String = read!("{}\n");
+        key = key.to_uppercase();
+
         let mut deciphered: Vec<u8> = Vec::new();
         // iterate over each character of cipher text and key (cyclic)
         for (a, b) in cipher.bytes().zip(key.bytes().cycle()) {
             // compute to decoded value and add it to the vector
             deciphered.push(decode(a, b));
         }
-        println!("{}", std::str::from_utf8(&deciphered).unwrap());
+        println!("Plain: {}", std::str::from_utf8(&deciphered).unwrap());
     }
 }
 
