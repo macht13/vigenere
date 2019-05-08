@@ -76,7 +76,7 @@ deploy:
   provider: GitHub
 
 cache:
-  - /user/home/.cargo/registry
+  - C:\Users\appveyor\.cargo\registry
   - target
 
 branches:
