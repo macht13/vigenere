@@ -21,13 +21,13 @@ fn encoder() {
     // get input
     println!("Please enter plaintext:");
     let mut plain: String = read!("{}\n");
-    plain = plain.replace("\r", "").to_uppercase();
+    plain = plain.replace("\r", "").replace(" ", "").to_uppercase();
     println!("Now please enter any number of keys as single lines:");
     // get key and encrypt
     loop {
         // read key
         let mut key: String = read!("{}\n");
-        key = key.replace("\r", "").to_uppercase();
+        key = key.replace("\r", "").replace(" ", "").to_uppercase();
 
         let mut enciphered: Vec<u8> = Vec::new();
         // iterate over each character of plain text and key (cyclic)
@@ -43,13 +43,13 @@ fn decoder() {
     // get input
     println!("Please enter ciphertext:");
     let mut cipher: String = read!("{}\n");
-    cipher = cipher.replace("\r", "").to_uppercase();
+    cipher = cipher.replace("\r", "").replace(" ", "").to_uppercase();
     println!("Now please enter any number of keys as single lines:");
     // get key and decrypt
     loop {
         // read key
         let mut key: String = read!("{}\n");
-        key = key.replace("\r", "").to_uppercase();
+        key = key.replace("\r", "").replace(" ", "").to_uppercase();
 
         let mut deciphered: Vec<u8> = Vec::new();
         // iterate over each character of cipher text and key (cyclic)
