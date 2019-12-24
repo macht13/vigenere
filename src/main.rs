@@ -1,96 +1,64 @@
-extern crate rand;
-
-use rand::Rng;
+use checkpoint as cp;
+use std::env;
 use std::io;
-use std::time::Instant;
+use std::process::exit;
 
-struct StatData {
-    times: Vec<u128>,
-    tries: Vec<u32>
-}
-
-impl StatData {
-    fn print(&self) {
-    let times: Vec<f64> = self.times.iter().cloned().map(|x| x as f64 / 1000.0).collect();
-
-    println!(
-        "Fertig!\nZeitinformation\n
-        μ: {}s\n
-        max: {}s\n
-        min: {}s",
-        mean_f64(&times),
-        times.iter().cloned().fold(0. / 0., f64::max),
-        times.iter().cloned().fold(1. / 0., f64::min)
-    );
-    println!("Versuchsinformation\n
-            μ: {}\n
-            max: {}\n
-            min: {}\n",
-            mean_u32(&self.tries),
-            self.tries.iter().cloned().fold(u32::min_value(), u32::max),
-            self.tries.iter().cloned().fold(u32::max_value(), u32::min));
-    }
-}
+#[macro_use]
+mod util;
+mod checkpoint;
 
 fn main() {
-    println!("Minimum (oder 10): ");
-    let min = read_num(Some(10));
-    println!("Maximum (nicht inklusive oder 100): ");
-    let max = read_num(Some(100));
-    println!("Anzahl (oder 5): ");
-    let cnt = read_num(Some(5));
-
-    game(min, max, cnt);
-}
-
-fn game(min: u32, max: u32, rounds: u32) {
-    let mut stats = StatData {
-        times: Vec::new(),
-        tries: Vec::new(),
-    };
-    for _ in 0..rounds {
-        let val1 = rand::thread_rng().gen_range(min, max);
-        let val2 = rand::thread_rng().gen_range(min, max);
-        let res = val1 * val2;
-        println!("{}*{}=", val1, val2);
-        let start = Instant::now();
-        let mut tries = 0;
-        loop {
-            tries += 1;
-            if read_num(None) == res {
-                break;
-            }
+    let args: Vec<String> = env::args().collect();
+    if let (Some(opt), Some(val)) = (args.get(1), args.get(2)) {
+        arg_handler(opt, val);
+    } else {
+        wprintln!("* (1)");
+        let mut input = String::new();
+        if io::stdin().read_line(&mut input).is_err() {
+            wprintln!("* Ich erwarte eine Eingabe");
+            exit(1);
         }
-        stats.tries.push(tries);
-        stats.times.push(start.elapsed().as_millis());
-    }
-
-    stats.print();
-}
-
-fn read_num(default: Option<u32>) -> u32 {
-    let mut input = String::new();
-    io::stdin()
-        .read_line(&mut input)
-        .expect("Failed to read from stdin");
-
-    match default {
-        Some(default) => input.trim().parse().unwrap_or(default),
-        None => {
-            match input.trim().parse::<u32>() {
-                Ok(val) => val,
-                Err(_)  => read_num(None)
-            }
+        util::trim_newline(&mut input);
+        if !input.to_ascii_lowercase().as_str().eq("erstderanfang") {
+            wprintln!("* Ich erwarte eine andere Eingabe");
+            exit(1);
+        } else {
+            input_handler();
         }
     }
 }
 
-fn mean_f64(list: &Vec<f64>) -> f64 {
-    let sum: f64 = Iterator::sum(list.iter());
-    f64::from(sum) / (list.len() as f64)
+fn arg_handler(opt: &str, val: &str) {
+    if let "CP" = opt {
+        wprintln!("Du willst wohl den Checkpoint: {} einlösen", val);
+        checkpoint_handler(val)
+    }
 }
 
-fn mean_u32(list: &Vec<u32>) -> f64 {
-    let sum: u32 = Iterator::sum(list.iter());
-    f64::from(sum) / (list.len() as f64)
+fn input_handler() {
+    wprintln!("Sehr gut, weter so. Als");
+    wprintln!("nechstes: Du weißt doch wi");
+    wprintln!("Checkpoints in alten Spielen funkioniert");
+    wprintln!("haben, oder? Also mache ic");
+    wprintln!("jetzt das gleche mit dir.");
+    wprintln!("Wenn du ds Programm manuell");
+    wprintln!("von CMD au diret startest,");
+    wprintln!("dann kanst du das genau");
+    wprintln!("so machn: '<programm-name> CP <check-point-wert>'.");
+    wprintln!("Dami du das ganze gleich");
+    wprintln!("ausprobiern kannst, bekommst du den");
+    wprintln!("checkpoint: '1' (ohne Anfuhrungszeichen), ich");
+    wprintln!("wunsche dir viel Erfolg dabei.");
+}
+
+fn checkpoint_handler(val: &str) {
+    match val {
+        "1" => cp::cp1(),
+        "23" => cp::cp23(),
+        "44" => cp::cp44(),
+        "474127" => cp::cp474127(),
+        _ => {
+            wprintln!("* Leider hast du falsch geraten. Es ist nicht so einfach, wie es ausschaut.")
+        }
+    }
 }
